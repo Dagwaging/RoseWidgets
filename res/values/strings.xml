@@ -8,5 +8,9 @@
     <string name="no_network">No connection</string>
     <string name="megabytes">%1$,.0f Mb</string>
     <string name="title_error">Unable to authenticate</string>
+    <string name="notification_exceeded_title">Bandwidth restricted to %1$s</string>
+    <string name="notification_exceeded_content">%1$,.0f Mb used of %2$,.0f Mb</string>
+    <string name="notification_unrestricted_title">Bandwidth unrestricted</string>
+    <string name="notification_unrestricted_content">%1$,.0f Mb used</string>
 
 </resources>

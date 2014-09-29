@@ -19,7 +19,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import android.app.Activity;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
@@ -49,7 +52,7 @@ public class UpdateService extends IntentService {
 
 	private static final String NETREG_URL = "http://netreg.rose-hulman.edu/tools/networkUsage.pl";
 
-	// private static final int LOWER_THROTTLE_LIMIT = 8192;
+	private static final int LOWER_THROTTLE_LIMIT = 8192;
 
 	private static final int UPPER_THROTTLE_LIMIT = 9216;
 
@@ -116,6 +119,37 @@ public class UpdateService extends IntentService {
 
 			update(appWidgetManager, appWidgetIds, data);
 
+			NetworkUsage oldData = NetworkUsage.load(prefs);
+
+			if (data.summary.policyMegabytesReceived > UPPER_THROTTLE_LIMIT
+					|| data.summary.policyMegabytesSent > UPPER_THROTTLE_LIMIT) {
+				if (oldData == null
+						|| (oldData.summary.policyMegabytesReceived <= UPPER_THROTTLE_LIMIT && oldData.summary.policyMegabytesSent <= UPPER_THROTTLE_LIMIT)) {
+					notifyRestricted(data.summary.bandwidthClass, Math.max(
+							data.summary.policyMegabytesReceived,
+							data.summary.policyMegabytesSent),
+							UPPER_THROTTLE_LIMIT);
+				}
+			} else if (data.summary.policyMegabytesReceived > LOWER_THROTTLE_LIMIT
+					|| data.summary.policyMegabytesSent > LOWER_THROTTLE_LIMIT) {
+				if (oldData == null
+						|| (oldData.summary.policyMegabytesReceived <= LOWER_THROTTLE_LIMIT && oldData.summary.policyMegabytesSent <= LOWER_THROTTLE_LIMIT)) {
+					notifyRestricted(data.summary.bandwidthClass, Math.max(
+							data.summary.policyMegabytesReceived,
+							data.summary.policyMegabytesSent),
+							LOWER_THROTTLE_LIMIT);
+				}
+			} else {
+				if (oldData != null
+						&& (oldData.summary.policyMegabytesReceived > LOWER_THROTTLE_LIMIT || oldData.summary.policyMegabytesSent > LOWER_THROTTLE_LIMIT)) {
+					notifyUnrestricted(data.summary.bandwidthClass, Math.max(
+							data.summary.policyMegabytesReceived,
+							data.summary.policyMegabytesSent));
+				}
+			}
+
+			data.save(prefs);
+
 			finished.setAction(ACTION_LOAD_SUCCESS);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -176,15 +210,7 @@ public class UpdateService extends IntentService {
 
 		views.setTextViewText(R.id.bandwidthClass, data.summary.bandwidthClass);
 
-		int icon = R.drawable.ic_action_navigation_refresh;
-
-		if (UNRESTRICTED.equals(data.summary.bandwidthClass)) {
-			icon = R.drawable.ic_action_navigation_accept;
-		} else if (RESTRICTED_1024.equals(data.summary.bandwidthClass)) {
-			icon = R.drawable.ic_action_alerts_and_states_warning;
-		} else if (RESTRICTED_256.equals(data.summary.bandwidthClass)) {
-			icon = R.drawable.ic_action_alerts_and_states_error;
-		}
+		int icon = getIcon(data.summary.bandwidthClass);
 
 		views.setImageViewResource(R.id.bandwidthClassIcon, icon);
 
@@ -312,5 +338,51 @@ public class UpdateService extends IntentService {
 		}
 
 		return null;
+	}
+
+	private void notifyRestricted(String bandwidthClass, float policyMegabytes,
+			float throttleLimitMegabytes) {
+		Notification notification = new Notification.Builder(this)
+				.setContentTitle(
+						getResources().getString(
+								R.string.notification_exceeded_title,
+								bandwidthClass))
+				.setContentText(
+						getResources().getString(
+								R.string.notification_exceeded_content,
+								policyMegabytes, throttleLimitMegabytes))
+				.setDefaults(Notification.DEFAULT_ALL)
+				.setSmallIcon(getIcon(bandwidthClass)).getNotification();
+
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
+		notificationManager.notify(0, notification);
+	}
+
+	private void notifyUnrestricted(String bandwidthClass, float policyMegabytes) {
+		Notification notification = new Notification.Builder(this)
+				.setContentTitle(
+						getResources().getString(
+								R.string.notification_unrestricted_title))
+				.setContentText(
+						getResources().getString(
+								R.string.notification_unrestricted_content,
+								policyMegabytes))
+				.setDefaults(Notification.DEFAULT_ALL)
+				.setSmallIcon(getIcon(bandwidthClass)).getNotification();
+
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
+		notificationManager.notify(0, notification);
+	}
+
+	private static int getIcon(String bandwidthClass) {
+		if (UNRESTRICTED.equals(bandwidthClass)) {
+			return R.drawable.ic_action_navigation_accept;
+		} else if (RESTRICTED_1024.equals(bandwidthClass)) {
+			return R.drawable.ic_action_alerts_and_states_warning;
+		} else if (RESTRICTED_256.equals(bandwidthClass)) {
+			return R.drawable.ic_action_alerts_and_states_error;
+		} else {
+			return R.drawable.ic_action_navigation_refresh;
+		}
 	}
 }

@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.dagwaging.rosewidgets.R;
-import com.dagwaging.rosewidgets.fragments.ConfigurationFragment;
 
 public class RoseWidgetProvider extends AppWidgetProvider {
 	public static final String MIN_WIDTH = "min_width";
@@ -31,9 +30,8 @@ public class RoseWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onDisabled(Context context) {
-		PreferenceManager.getDefaultSharedPreferences(context).edit()
-				.remove(ConfigurationFragment.PREF_PASSWORD)
-				.remove(ConfigurationFragment.PREF_USERNAME).commit();
+		PreferenceManager.getDefaultSharedPreferences(context).edit().clear()
+				.commit();
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -60,7 +58,7 @@ public class RoseWidgetProvider extends AppWidgetProvider {
 
 		appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views);
 	}
-	
+
 	public static void adjustWidgetSize(RemoteViews views, int minWidth) {
 		boolean showReceivedLabel = minWidth > 72;
 		boolean showBandwidth = minWidth > 216;
