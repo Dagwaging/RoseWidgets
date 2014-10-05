@@ -1,10 +1,10 @@
-package com.dagwaging.rosewidgets.activities;
+package com.dagwaging.rosewidgets.netreg.activities;
 
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
 
-import com.dagwaging.rosewidgets.fragments.ConfigurationFragment;
+import com.dagwaging.rosewidgets.netreg.fragments.ConfigurationFragment;
 
 public class ConfigurationActivity extends Activity {
 	@Override

@@ -3,7 +3,6 @@ package com.dagwaging.rosewidgets.fragments;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -30,18 +29,17 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.dagwaging.rosewidgets.R;
-import com.dagwaging.rosewidgets.widget.RoseWidgetProvider;
-import com.dagwaging.rosewidgets.widget.UpdateService;
+import com.dagwaging.rosewidgets.netreg.widget.UpdateService;
 
-public class ConfigurationFragment extends DialogFragment implements
+public abstract class ConfigurationFragment extends DialogFragment implements
 		OnClickListener, android.view.View.OnClickListener, TextWatcher, OnEditorActionListener {
 	protected static final String TAG = "com.dagwaging.rosewidgets.fragments.ConfigurationFragment";
 
 	private int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
-	private EditText usernameField;
+	protected EditText usernameField;
 
-	private EditText passwordField;
+	protected EditText passwordField;
 
 	private BroadcastReceiver receiver;
 
@@ -50,10 +48,6 @@ public class ConfigurationFragment extends DialogFragment implements
 	private Button okay;
 
 	private Timer progressDialogTimer;
-
-	public static String PREF_USERNAME = "username";
-
-	public static String PREF_PASSWORD = "password";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -67,7 +61,7 @@ public class ConfigurationFragment extends DialogFragment implements
 		}
 
 		if (!PreferenceManager.getDefaultSharedPreferences(getActivity())
-				.getString(PREF_USERNAME, "").isEmpty()) {
+				.getString(getPrefUsername(), "").isEmpty()) {
 			finishWidget();
 		}
 
@@ -107,29 +101,8 @@ public class ConfigurationFragment extends DialogFragment implements
 		getActivity().registerReceiver(receiver, filter);
 	}
 
-	@SuppressLint("InflateParams")
 	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-		View view = getActivity().getLayoutInflater().inflate(
-				R.layout.configuration, null);
-
-		usernameField = (EditText) view.findViewById(R.id.username);
-		passwordField = (EditText) view.findViewById(R.id.password);
-
-		usernameField.addTextChangedListener(this);
-		passwordField.addTextChangedListener(this);
-		
-		passwordField.setOnEditorActionListener(this);
-
-		Builder builder = new Builder(getActivity());
-		builder.setTitle(R.string.app_name);
-		builder.setView(view);
-		builder.setNegativeButton(android.R.string.cancel, this);
-		builder.setPositiveButton(android.R.string.ok, null);
-
-		return builder.create();
-	}
+	public abstract Dialog onCreateDialog(Bundle savedInstanceState);
 
 	@Override
 	public void onStart() {
@@ -156,8 +129,8 @@ public class ConfigurationFragment extends DialogFragment implements
 		String password = passwordField.getText().toString();
 
 		PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
-				.putString(PREF_USERNAME, username)
-				.putString(PREF_PASSWORD, password).commit();
+				.putString(getPrefUsername(), username)
+				.putString(getPrefPassword(), password).commit();
 
 		progressDialogTimer = new Timer();
 		progressDialogTimer.schedule(new TimerTask() {
@@ -174,9 +147,15 @@ public class ConfigurationFragment extends DialogFragment implements
 				});
 			}
 		}, 500);
-
-		RoseWidgetProvider.update(getActivity(), new int[] { appWidgetId });
+		
+		onSave(appWidgetId);
 	}
+	
+	protected abstract void onSave(int appWidgetId);
+	
+	protected abstract String getPrefUsername();
+	
+	protected abstract String getPrefPassword();
 
 	private void finishWidget() {
 		Intent result = new Intent();

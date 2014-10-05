@@ -4,9 +4,9 @@
     android:minHeight="62dp"
     android:minResizeWidth="62dp"
     android:minResizeHeight="62dp"
-    android:initialLayout="@layout/widget"
+    android:initialLayout="@layout/widget_netreg"
     android:updatePeriodMillis="300000"
-    android:configure="com.dagwaging.rosewidgets.activities.ConfigurationActivity"
+    android:configure="com.dagwaging.rosewidgets.netreg.activities.ConfigurationActivity"
     android:resizeMode="horizontal"
     android:previewImage="@drawable/rosewidgets_ori_portrait"
     >

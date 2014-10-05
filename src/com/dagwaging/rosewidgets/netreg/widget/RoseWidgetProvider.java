@@ -1,4 +1,4 @@
-package com.dagwaging.rosewidgets.widget;
+package com.dagwaging.rosewidgets.netreg.widget;
 
 import android.annotation.TargetApi;
 import android.appwidget.AppWidgetManager;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.dagwaging.rosewidgets.R;
+import com.dagwaging.rosewidgets.netreg.fragments.ConfigurationFragment;
 
 public class RoseWidgetProvider extends AppWidgetProvider {
 	public static final String MIN_WIDTH = "min_width";
@@ -30,8 +31,9 @@ public class RoseWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onDisabled(Context context) {
-		PreferenceManager.getDefaultSharedPreferences(context).edit().clear()
-				.commit();
+		PreferenceManager.getDefaultSharedPreferences(context).edit()
+				.remove(ConfigurationFragment.PREF_USERNAME)
+				.remove(ConfigurationFragment.PREF_PASSWORD).commit();
 	}
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -52,7 +54,7 @@ public class RoseWidgetProvider extends AppWidgetProvider {
 				.putInt(MIN_WIDTH, minWidth).commit();
 
 		RemoteViews views = new RemoteViews(context.getPackageName(),
-				R.layout.widget);
+				R.layout.widget_netreg);
 
 		adjustWidgetSize(views, minWidth);
 

@@ -1,4 +1,4 @@
-package com.dagwaging.rosewidgets.ntlm;
+package com.dagwaging.rosewidgets.netreg.ntlm;
 
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthSchemeFactory;

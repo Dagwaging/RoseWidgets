@@ -1,4 +1,4 @@
-package com.dagwaging.rosewidgets.ntlm;
+package com.dagwaging.rosewidgets.netreg.ntlm;
 
 import java.io.IOException;
 

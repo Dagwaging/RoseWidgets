@@ -1,4 +1,4 @@
-package com.dagwaging.rosewidgets.widget;
+package com.dagwaging.rosewidgets.netreg.widget;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.ParseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
@@ -35,14 +36,14 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.dagwaging.rosewidgets.R;
-import com.dagwaging.rosewidgets.data.NetworkUsage;
-import com.dagwaging.rosewidgets.data.NetworkUsageDetails;
-import com.dagwaging.rosewidgets.data.NetworkUsageSummary;
-import com.dagwaging.rosewidgets.fragments.ConfigurationFragment;
-import com.dagwaging.rosewidgets.ntlm.NTLMSchemeFactory;
+import com.dagwaging.rosewidgets.netreg.data.NetworkUsage;
+import com.dagwaging.rosewidgets.netreg.data.NetworkUsageDetails;
+import com.dagwaging.rosewidgets.netreg.data.NetworkUsageSummary;
+import com.dagwaging.rosewidgets.netreg.fragments.ConfigurationFragment;
+import com.dagwaging.rosewidgets.netreg.ntlm.NTLMSchemeFactory;
 
 public class UpdateService extends IntentService {
-	public static String TAG = "com.dagwaging.rosewidgets.widget.UpdateService";
+	public static String TAG = "com.dagwaging.rosewidgets.netreg.widget.UpdateService";
 
 	public static String ACTION_LOAD_SUCCESS = "com.dagwaging.rosewidgets.ACTION_LOAD_SUCCESS";
 
@@ -168,7 +169,7 @@ public class UpdateService extends IntentService {
 	}
 
 	private void reset(AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget);
+		RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_netreg);
 
 		int minWidth = PreferenceManager.getDefaultSharedPreferences(this)
 				.getInt(RoseWidgetProvider.MIN_WIDTH, 0);
@@ -194,7 +195,7 @@ public class UpdateService extends IntentService {
 
 	private void update(AppWidgetManager appWidgetManager, int[] appWidgetIds,
 			NetworkUsage data) {
-		RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget);
+		RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_netreg);
 
 		int minWidth = PreferenceManager.getDefaultSharedPreferences(this)
 				.getInt(RoseWidgetProvider.MIN_WIDTH, 0);
@@ -234,7 +235,7 @@ public class UpdateService extends IntentService {
 	private void update(AppWidgetManager appWidgetManager, int[] appWidgetIds,
 			String error) {
 		RemoteViews views = new RemoteViews(getPackageName(),
-				R.layout.widget_error);
+				R.layout.widget_netreg_error);
 
 		Intent update = new Intent(this, UpdateService.class);
 		update.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
@@ -264,7 +265,7 @@ public class UpdateService extends IntentService {
 
 		HttpResponse response = httpclient.execute(new HttpGet(NETREG_URL));
 
-		if (response.getStatusLine().getStatusCode() != 200) {
+		if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			throw new IOException(response.getStatusLine().getReasonPhrase());
 		}
 

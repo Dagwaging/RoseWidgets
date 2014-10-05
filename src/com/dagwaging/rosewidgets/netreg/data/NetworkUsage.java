@@ -1,4 +1,4 @@
-package com.dagwaging.rosewidgets.data;
+package com.dagwaging.rosewidgets.netreg.data;
 
 import java.util.List;
 

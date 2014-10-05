@@ -1,7 +1,9 @@
-package com.dagwaging.rosewidgets.data;
+package com.dagwaging.rosewidgets.netreg.data;
 
-public class NetworkUsageSummary {
-	public String bandwidthClass;
+public class NetworkUsageDetails {
+	public String networkAddress;
+	
+	public String comment;
 	
 	public Float policyMegabytesReceived;
 	
