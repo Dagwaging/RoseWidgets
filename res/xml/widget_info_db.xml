@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="128dp"
+    android:minWidth="176dp"
     android:minHeight="62dp"
-    android:minResizeWidth="62dp"
+    android:minResizeWidth="176dp"
     android:minResizeHeight="62dp"
     android:initialLayout="@layout/widget_db"
     android:updatePeriodMillis="300000"
     android:configure="com.dagwaging.rosewidgets.db.activities.ConfigurationActivity"
     android:resizeMode="horizontal"
-    android:previewImage="@drawable/rosewidgets_ori_portrait"
+    android:previewImage="@drawable/rosewidgets_db_ori_portrait"
     >
 
 </appwidget-provider>

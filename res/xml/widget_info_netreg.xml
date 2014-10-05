@@ -8,7 +8,7 @@
     android:updatePeriodMillis="300000"
     android:configure="com.dagwaging.rosewidgets.netreg.activities.ConfigurationActivity"
     android:resizeMode="horizontal"
-    android:previewImage="@drawable/rosewidgets_ori_portrait"
+    android:previewImage="@drawable/rosewidgets_netreg_ori_portrait"
     >
 
 </appwidget-provider>
