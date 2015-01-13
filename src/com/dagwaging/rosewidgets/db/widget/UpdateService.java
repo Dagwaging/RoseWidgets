@@ -3,6 +3,8 @@ package com.dagwaging.rosewidgets.db.widget;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -18,7 +20,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import android.app.Activity;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
@@ -41,6 +46,8 @@ public class UpdateService extends IntentService {
 	public static String ACTION_LOAD_SUCCESS = "com.dagwaging.rosewidgets.ACTION_LOAD_SUCCESS";
 
 	public static String ACTION_LOAD_FAILURE = "com.dagwaging.rosewidgets.ACTION_LOAD_FAILURE";
+
+	public static final String PREF_NOTIFIED = "notified";
 
 	public static final String EXTRA_LOAD_ERROR = "com.dagwaging.rosewidgets.EXTRA_LOAD_ERROR";
 
@@ -105,6 +112,40 @@ public class UpdateService extends IntentService {
 				throw new IOException("Bad response");
 			}
 
+			boolean notified = prefs.getBoolean(PREF_NOTIFIED, false);
+
+			Calendar date = new GregorianCalendar();
+
+			if (date.get(GregorianCalendar.DAY_OF_WEEK) == GregorianCalendar.WEDNESDAY
+					&& date.get(GregorianCalendar.HOUR_OF_DAY) >= 8) {
+				if (!notified) {
+					String db = null;
+
+					for (Balance balance : data) {
+						if ("Declining Balance:".equals(balance.label)) {
+							db = balance.value;
+							break;
+						}
+					}
+
+					if (db != null) {
+						Notification notification = new Notification.Builder(
+								this)
+								.setContentTitle("You have " + db + " to spend")
+								.setDefaults(Notification.DEFAULT_ALL)
+								.setSmallIcon(R.drawable.ic_alert_cash)
+								.getNotification();
+
+						NotificationManager notificationManager = (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
+						notificationManager.notify(0, notification);
+
+						prefs.edit().putBoolean(PREF_NOTIFIED, true).apply();
+					}
+				}
+			} else if (notified) {
+				prefs.edit().putBoolean(PREF_NOTIFIED, false).apply();
+			}
+
 			update(appWidgetManager, appWidgetIds, data);
 
 			finished.setAction(ACTION_LOAD_SUCCESS);
@@ -159,7 +200,7 @@ public class UpdateService extends IntentService {
 
 			views.addView(R.id.balances, balanceView);
 		}
-		
+
 		appWidgetManager.updateAppWidget(appWidgetIds, views);
 	}
 
