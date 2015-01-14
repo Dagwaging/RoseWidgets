@@ -117,7 +117,7 @@ public class UpdateService extends IntentService {
 			Calendar date = new GregorianCalendar();
 
 			if (date.get(GregorianCalendar.DAY_OF_WEEK) == GregorianCalendar.WEDNESDAY
-					&& date.get(GregorianCalendar.HOUR_OF_DAY) >= 8) {
+					&& date.get(GregorianCalendar.HOUR_OF_DAY) >= 20) {
 				if (!notified) {
 					String db = null;
 
